@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import tw from "twin.macro";
+
+import { usePlayerStore } from "../stores/usePlayerStore";
+
 export default function AddPlayerForm() {
+    // Accessing action
+    const addPlayer = usePlayerStore((state) => state.addPlayer);
+
     const [val, setVal] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (val !== "") {
+            // Add new player
+            addPlayer(val);
             setVal("");
         }
     };

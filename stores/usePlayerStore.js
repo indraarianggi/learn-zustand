@@ -1,4 +1,5 @@
 import create from "zustand";
+import { devtools } from "zustand/middleware";
 
 const url =
     "https://my-json-server.typicode.com/gmahima/NextWithZustand/players";
@@ -49,16 +50,69 @@ const handleLoadPlayers = async (set, get) => {
         });
 };
 
+const storePlayer = async (player) => {
+    await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(player),
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+    })
+        .then(
+            (res) => {
+                if (res.ok) {
+                    return res;
+                } else {
+                    let err = res.json();
+                    err.res = res;
+                    throw err;
+                }
+            },
+            (error) => {
+                console.log("error: ", error);
+                let errmes = new Error(error.message);
+                throw errmes;
+            }
+        )
+        .then((res) => res.json())
+        .then((res) => console.log(res))
+        .catch((error) => {
+            console.log(error);
+        });
+};
+
+const handleAddPlayer = async (name, set, get) => {
+    let players = [...get().players];
+    let newPlayer = {};
+    newPlayer.name = name;
+    newPlayer.id = (players.length + 1).toString();
+
+    await storePlayer(newPlayer)
+        .then(() => {
+            newPlayer.score = 0;
+            players.push(newPlayer);
+            set({ players: players });
+        })
+        .catch((e) => console.log(e));
+};
+
 // Create a store
-export const usePlayerStore = create((set, get) => ({
-    players: initialPlayers,
-    // handling asynchronous action
-    loadPlayers: async () => {
-        await handleLoadPlayers(set, get);
-    },
-    highScore: 0,
-    setHighScore: (score) => set({ highScore: score }),
-    changePlayerScore: (id, dir) => {
-        handleChangePlayerScore(id, dir, set, get);
-    },
-}));
+export const usePlayerStore = create(
+    devtools((set, get) => ({
+        players: initialPlayers,
+        // handling asynchronous action
+        loadPlayers: async () => {
+            await handleLoadPlayers(set, get);
+        },
+        highScore: 0,
+        setHighScore: (score) => set({ highScore: score }),
+        changePlayerScore: (id, dir) => {
+            handleChangePlayerScore(id, dir, set, get);
+        },
+        addPlayer: (name) => {
+            handleAddPlayer(name, set, get);
+        },
+        deleteEverything: () => set({}, true), // true replaces state model instead of merging it
+    }))
+);

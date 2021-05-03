@@ -1,5 +1,8 @@
 import create from "zustand";
 
+const url =
+    "https://my-json-server.typicode.com/gmahima/NextWithZustand/players";
+
 const initialPlayers = [
     {
         id: "1",
@@ -33,9 +36,26 @@ const handleChangePlayerScore = (id, dir, set, get) => {
     set({ players: playersCopy });
 };
 
+// handle asynchronous function
+const handleLoadPlayers = async (set, get) => {
+    fetch(url)
+        .then((res) => res.json())
+        .then((players) => {
+            players.map((p) => (p.score = 0));
+            set({ players: players });
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+};
+
 // Create a store
 export const usePlayerStore = create((set, get) => ({
     players: initialPlayers,
+    // handling asynchronous action
+    loadPlayers: async () => {
+        await handleLoadPlayers(set, get);
+    },
     highScore: 0,
     setHighScore: (score) => set({ highScore: score }),
     changePlayerScore: (id, dir) => {

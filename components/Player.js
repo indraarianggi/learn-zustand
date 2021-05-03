@@ -6,6 +6,7 @@ import { Star } from "@styled-icons/boxicons-solid/Star";
 import { Vip } from "@styled-icons/remix-line/Vip";
 
 import { usePlayerStore } from "../stores/usePlayerStore";
+import { useVipStore } from "../stores/useVipStore";
 
 const PlayerDiv = styled.div`
     ${tw`
@@ -35,13 +36,14 @@ const StyledVip = styled(Vip)`
     }}
 `;
 export default function Player({ player }) {
-    // Accessing state and action
+    // Accessing state and action from player store
     const changePlayerScore = usePlayerStore(
         (state) => state.changePlayerScore
     );
     const highScore = usePlayerStore((state) => state.highScore);
 
-    const vips = ["2", "5"];
+    // Accessing state and action from vip store
+    const vips = useVipStore((state) => state.vips);
 
     return (
         <PlayerDiv>

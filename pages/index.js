@@ -3,19 +3,16 @@ import styled, { css } from "styled-components";
 import tw from "twin.macro";
 import Player from "../components/Player";
 import AddPlayerForm from "../components/AddPlayer";
+
+import shallow from "zustand/shallow";
+import { usePlayerStore } from "../stores/usePlayerStore";
+
 export default function Home() {
-    const players = [
-        {
-            id: "1",
-            score: 10,
-            name: "harry",
-        },
-        {
-            id: "2",
-            score: 0,
-            name: "ron",
-        },
-    ];
+    // Extract multiple state slices into an object
+    const { players, highScore } = usePlayerStore(
+        (state) => ({ players: state.players, highScore: state.highScore }),
+        shallow
+    );
 
     return (
         <div
@@ -26,7 +23,7 @@ export default function Home() {
                 <h2
                     css={tw`mt-2 sm:mt-8 py-1 px-2 md:py-2 md:px-8  self-center border-2 border-green-400 rounded-lg font-semibold`}
                 >
-                    High Score: {0}
+                    High Score: {highScore}
                 </h2>
             </div>
             <AddPlayerForm></AddPlayerForm>
